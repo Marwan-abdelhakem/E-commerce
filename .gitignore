@@ -1,5 +1,6 @@
 node_modules
 .env
 src/config/.env
+src/config/.env.development
 .DS_Store
 *.log

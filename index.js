@@ -5,10 +5,12 @@ import { fileURLToPath } from "url"
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Load .env only in development (when MONGO_URL is not set)
-if (!process.env.MONGO_URL) {
-  dotenv.config({ path: path.join(__dirname, "src/config/.env") })
-}
+// Load appropriate .env file based on environment
+const envFile = process.env.NODE_ENV === 'production' 
+  ? 'src/config/.env.production' 
+  : 'src/config/.env.development'
+
+dotenv.config({ path: path.join(__dirname, envFile) })
 
 import express from "express"
 import swaggerUi from 'swagger-ui-express'
