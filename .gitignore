@@ -1,1 +1,5 @@
 node_modules
+.env
+src/config/.env.production
+.DS_Store
+*.log

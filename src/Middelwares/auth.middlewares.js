@@ -3,9 +3,15 @@ import UserModel from "../DB/model/User.model.js";
 
 
 export const authentication = async (req, res, next) => {
-    const token = req.headers.authorization || req.cookies.accessToken;
+    let token = req.headers.authorization || req.cookies.accessToken;
+    
     if (!token) {
         return next(new Error("Token required!", { cause: 401 }));
+    }
+
+    // Remove "Bearer " prefix if exists
+    if (token.startsWith('Bearer ')) {
+        token = token.slice(7);
     }
 
     try {

@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node --watch --env-file=./src/config/.env index.js"
+    "dev": "node --watch --env-file=./src/config/.env index.js",
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +15,7 @@
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.9.0",
     "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
     "crypto-js": "^4.2.0",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
@@ -22,6 +24,8 @@
     "mongoose": "^9.3.0",
     "multer": "^2.1.1",
     "nodemailer": "^8.0.2",
-    "streamifier": "^0.1.1"
+    "streamifier": "^0.1.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   }
 }
