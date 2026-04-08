@@ -19,18 +19,19 @@ const router = Router()
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - name
  *             properties:
  *               name:
  *                 type: string
  *                 example: Electronics
- *               description:
- *                 type: string
- *                 example: Electronic devices and accessories
  *     responses:
  *       201:
  *         description: تم إنشاء التصنيف بنجاح
+ *       409:
+ *         description: التصنيف موجود بالفعل
  *       401:
- *         description: غير مصرح
+ *         description: غير مصرح - Token مطلوب
  */
 router.post("/createCategory", authentication, categoryService.createCategory)
 
@@ -45,6 +46,26 @@ router.post("/createCategory", authentication, categoryService.createCategory)
  *     responses:
  *       200:
  *         description: قائمة التصنيفات
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *       409:
+ *         description: لا توجد تصنيفات
+ *       401:
+ *         description: غير مصرح
  */
 router.get("/getAllCategory", authentication, categoryService.getAllCategory)
 
@@ -62,12 +83,15 @@ router.get("/getAllCategory", authentication, categoryService.getAllCategory)
  *         required: true
  *         schema:
  *           type: string
- *         description: معرف التصنيف
+ *         description: معرف التصنيف (MongoDB ObjectId)
+ *         example: 507f1f77bcf86cd799439011
  *     responses:
  *       200:
  *         description: بيانات التصنيف
- *       404:
+ *       409:
  *         description: التصنيف غير موجود
+ *       401:
+ *         description: غير مصرح
  */
 router.get("/getCategoryById/:id", authentication, categoryService.getCategoryById)
 
@@ -86,6 +110,7 @@ router.get("/getCategoryById/:id", authentication, categoryService.getCategoryBy
  *         schema:
  *           type: string
  *         description: معرف التصنيف
+ *         example: 507f1f77bcf86cd799439011
  *     requestBody:
  *       required: true
  *       content:
@@ -95,13 +120,14 @@ router.get("/getCategoryById/:id", authentication, categoryService.getCategoryBy
  *             properties:
  *               name:
  *                 type: string
- *               description:
- *                 type: string
+ *                 example: Updated Electronics
  *     responses:
  *       200:
  *         description: تم التحديث بنجاح
- *       404:
+ *       409:
  *         description: التصنيف غير موجود
+ *       401:
+ *         description: غير مصرح
  */
 router.patch("/updateCategory/:id", authentication, categoryService.updateCategory)
 
@@ -120,11 +146,14 @@ router.patch("/updateCategory/:id", authentication, categoryService.updateCatego
  *         schema:
  *           type: string
  *         description: معرف التصنيف
+ *         example: 507f1f77bcf86cd799439011
  *     responses:
  *       200:
  *         description: تم الحذف بنجاح
- *       404:
+ *       409:
  *         description: التصنيف غير موجود
+ *       401:
+ *         description: غير مصرح
  */
 router.delete("/deleteCategory/:id", authentication, categoryService.deleteCategory)
 
