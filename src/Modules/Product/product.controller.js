@@ -10,50 +10,50 @@ const router = Router()
 /**
  * @swagger
  * /api/product/createProduct:
- * post:
- * summary: إنشاء منتج جديد مع Variations وصور
- * tags: [Product]
- * requestBody:
- * required: true
- * content:
- * multipart/form-data:
- * schema:
- * type: object
- * required:
- * - name
- * - price
- * - category
- * properties:
- * name:
- * type: string
- * example: iPhone 15 Pro
- * description:
- * type: string
- * example: Latest iPhone model with A17 Pro chip
- * price:
- * type: number
- * example: 999.99
- * category:
- * type: string
- * description: ID بتاع التصنيف
- * example: 507f1f77bcf86cd799439011
- * variations:
- * type: string
- * description: "مصفوفة الـ variations محولة لـ String (JSON). مثال: [{'colorName':'Red','stock':10}]"
- * example: '[{"colorName":"Black","colorValue":"#000000","stock":50}]'
- * variant_image_0:
- * type: string
- * format: binary
- * description: صورة الـ Variant الأول
- * variant_image_1:
- * type: string
- * format: binary
- * description: صورة الـ Variant الثاني (اختياري)
- * responses:
- * 201:
- * description: تم إنشاء المنتج بنجاح
- * 400:
- * description: خطأ في البيانات المدخلة
+ *   post:
+ *     summary: إنشاء منتج جديد مع Variations وصور
+ *     tags: [Product]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - price
+ *               - category
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: iPhone 15 Pro
+ *               description:
+ *                 type: string
+ *                 example: Latest iPhone model with A17 Pro chip
+ *               price:
+ *                 type: number
+ *                 example: 999.99
+ *               category:
+ *                 type: string
+ *                 description: ID بتاع التصنيف
+ *                 example: 507f1f77bcf86cd799439011
+ *               variations:
+ *                 type: string
+ *                 description: "مصفوفة الـ variations محولة لـ String (JSON)"
+ *                 example: '[{"colorName":"Black","colorValue":"#000000","stock":50}]'
+ *               variant_image_0:
+ *                 type: string
+ *                 format: binary
+ *                 description: صورة الـ Variant الأول
+ *               variant_image_1:
+ *                 type: string
+ *                 format: binary
+ *                 description: صورة الـ Variant الثاني (اختياري)
+ *     responses:
+ *       201:
+ *         description: تم إنشاء المنتج بنجاح
+ *       400:
+ *         description: خطأ في البيانات المدخلة
  */
 
 router.post("/createProduct", fileUpload().any(), productService.createProducts)

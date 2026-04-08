@@ -5,6 +5,8 @@ import cors from "cors";
 import authRouter from "./Modules/auth/auth.controller.js"
 import productRouter from "./Modules/Product/product.controller.js"
 import categoryRouter from "./Modules/Category/categort.controller.js"
+import orderRouter from "./Modules/order/order.controller.js"
+
 
 const bootStrap = async (app, express) => {
     // CORS - Allow all origins
@@ -32,6 +34,7 @@ const bootStrap = async (app, express) => {
     app.use("/api/auth", authRouter)
     app.use("/api/product", productRouter)
     app.use("/api/category", categoryRouter)
+    app.use("/api/order", orderRouter)
 
 
     // 404 handler - must be after all routes
