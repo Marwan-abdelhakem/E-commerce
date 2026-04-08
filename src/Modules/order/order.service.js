@@ -4,12 +4,11 @@ import OrderModel from "../../DB/model/order.model.js";
 
 export const createOrder = async (req, res, next) => {
     const { items } = req.body;
-    const userId = req.user._id; // بنجيبه من الـ auth middleware
+    const userId = req.user._id;
 
     let finalItems = [];
     let totalPrice = 0;
 
-    // 1. اللف على المنتجات المطلوبة للتأكد من السعر والكمية
     for (const item of items) {
         const product = await ProductModel.findById(item.product);
 
@@ -21,21 +20,17 @@ export const createOrder = async (req, res, next) => {
             return next(new Error(`Sorry, only ${product.stock} units of ${product.name} available.`));
         }
 
-        // 2. حسبة السعر (سعر المنتج من الـ DB * الكمية)
         totalPrice += product.price * item.quantity;
 
-        // 3. تجهيز الـ item عشان يتسيف
         finalItems.push({
             product: product._id,
             quantity: item.quantity
         });
 
-        // 4. تحديث الـ Stock (ننقص الكمية)
         product.stock -= item.quantity;
         await product.save();
     }
 
-    // 5. إنشاء الأوردر في الداتابيز
     const order = await OrderModel.create({
         user: userId,
         items: finalItems,
