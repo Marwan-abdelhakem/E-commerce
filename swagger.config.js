@@ -14,7 +14,7 @@ const options = {
     servers: [
       {
         url: 'https://e-commerce-a6cz.onrender.com/',
-        description: 'Production server',
+        description: 'Production',
       },
     ],
     components: {
