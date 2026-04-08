@@ -13,11 +13,7 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:3000',
-        description: 'Development server',
-      },
-      {
-        url: 'https://your-app.onrender.com',
+        url: 'https://e-commerce-a6cz.onrender.com/',
         description: 'Production server',
       },
     ],
