@@ -35,28 +35,28 @@ const router = Router()
  *                 type: string
  *                 minLength: 3
  *                 maxLength: 20
- *                 example: Ahmed Ali Mohamed
+ *                 example: Marawan Abd ElHakeem
  *               userName:
  *                 type: string
  *                 minLength: 3
  *                 maxLength: 20
- *                 example: ahmed_ali
+ *                 example: marawan_abdo
  *               age:
  *                 type: number
  *                 minimum: 0
  *                 example: 25
  *               phone:
  *                 type: string
- *                 example: "01012345678"
+ *                 example: "01000765096"
  *               email:
  *                 type: string
  *                 format: email
- *                 example: ahmed@example.com
+ *                 example: marawan@example.com
  *               password:
  *                 type: string
  *                 minLength: 6
  *                 description: يجب أن يحتوي على حرف كبير ورمز خاص
- *                 example: Password@123
+ *                 example: Password123!
  *     responses:
  *       201:
  *         description: تم التسجيل بنجاح
@@ -95,10 +95,10 @@ router.post("/signUp", validation(signUpValidation), authServeice.signUp)
  *               email:
  *                 type: string
  *                 format: email
- *                 example: ahmed@example.com
+ *                 example: marawan@example.com
  *               password:
  *                 type: string
- *                 example: Password@123
+ *                 example: Password123!
  *     responses:
  *       200:
  *         description: تم تسجيل الدخول بنجاح
