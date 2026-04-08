@@ -1,54 +1,62 @@
 import { Router } from "express";
 import * as productService from "./product.service.js"
 import { authentication, authorization } from "../../Middelwares/auth.middlewares.js";
-
+import { fileUpload } from "../../Utlis/multer.utlis.js"
 
 const router = Router()
+
+
 
 /**
  * @swagger
  * /api/product/createProduct:
- *   post:
- *     summary: إنشاء منتج جديد
- *     tags: [Product]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - name
- *               - price
- *               - stock
- *               - category
- *             properties:
- *               name:
- *                 type: string
- *                 example: iPhone 15 Pro
- *               description:
- *                 type: string
- *                 example: Latest iPhone model with A17 Pro chip
- *               price:
- *                 type: number
- *                 example: 999.99
- *               stock:
- *                 type: number
- *                 example: 50
- *               category:
- *                 type: string
- *                 description: معرف التصنيف (MongoDB ObjectId)
- *                 example: 507f1f77bcf86cd799439011
- *               image:
- *                 type: string
- *                 example: https://example.com/image.jpg
- *     responses:
- *       201:
- *         description: تم إنشاء المنتج بنجاح
- *       400:
- *         description: خطأ في البيانات المدخلة
+ * post:
+ * summary: إنشاء منتج جديد مع Variations وصور
+ * tags: [Product]
+ * requestBody:
+ * required: true
+ * content:
+ * multipart/form-data:
+ * schema:
+ * type: object
+ * required:
+ * - name
+ * - price
+ * - category
+ * properties:
+ * name:
+ * type: string
+ * example: iPhone 15 Pro
+ * description:
+ * type: string
+ * example: Latest iPhone model with A17 Pro chip
+ * price:
+ * type: number
+ * example: 999.99
+ * category:
+ * type: string
+ * description: ID بتاع التصنيف
+ * example: 507f1f77bcf86cd799439011
+ * variations:
+ * type: string
+ * description: "مصفوفة الـ variations محولة لـ String (JSON). مثال: [{'colorName':'Red','stock':10}]"
+ * example: '[{"colorName":"Black","colorValue":"#000000","stock":50}]'
+ * variant_image_0:
+ * type: string
+ * format: binary
+ * description: صورة الـ Variant الأول
+ * variant_image_1:
+ * type: string
+ * format: binary
+ * description: صورة الـ Variant الثاني (اختياري)
+ * responses:
+ * 201:
+ * description: تم إنشاء المنتج بنجاح
+ * 400:
+ * description: خطأ في البيانات المدخلة
  */
-router.post("/createProduct", productService.createProducts)
+
+router.post("/createProduct", fileUpload().any(), productService.createProducts)
 
 /**
  * @swagger

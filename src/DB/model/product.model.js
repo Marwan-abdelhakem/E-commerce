@@ -1,39 +1,61 @@
 import mongoose from "mongoose";
 
-const productSchema = new mongoose.Schema({
+const productSchema = new mongoose.Schema(
+    {
+        name: {
+            type: String,
+            required: true,
+            trim: true, // زيادة جدعنة عشان يشيل المسافات الزايدة
+        },
 
-    name: {
-        type: String,
-        required: true
+        description: {
+            type: String,
+        },
+
+        price: {
+            type: Number,
+            required: true,
+        },
+
+        stock: {
+            type: Number,
+        },
+
+        category: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Category",
+            required: true,
+        },
+
+        variations: [
+            {
+                colorName: { type: String },
+                colorValue: { type: String },
+                defaultImg: { type: String },
+                variantImages: [{ type: String }], // Array of strings (links)
+                defaultVariant: { type: Boolean, default: false },
+                stock: { type: Number, default: 0 },
+            },
+        ],
+
+        featured: {
+            type: Boolean,
+            default: false,
+        },
+
+        visible: {
+            type: Boolean,
+            default: true,
+        },
+
+        deleted: {
+            type: Boolean,
+            default: false,
+        },
     },
+    { timestamps: true }
+);
 
-    description: {
-        type: String
-    },
+const ProductModel = mongoose.models.Product || mongoose.model("Product", productSchema);
 
-    price: {
-        type: Number,
-        required: true
-    },
-
-    stock: {   //numbers  of product
-        type: Number,
-        required: true
-    },
-
-    category: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Category"
-    },
-
-    image: {
-        type: String
-    }
-
-}, { timestamps: true });
-
-
-const ProductModel = mongoose.models.products || mongoose.model("products", productSchema)
-
-export default ProductModel
-
+export default ProductModel;

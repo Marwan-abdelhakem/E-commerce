@@ -16,13 +16,14 @@ const bootStrap = async (app, express) => {
     }))
 
     app.use(express.json())
+    app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());
 
     await connectDb()
 
     // Root endpoint
     app.get("/", (req, res) => {
-        res.json({ 
+        res.json({
             message: "E-Commerce API is running",
             documentation: "/api-docs"
         })

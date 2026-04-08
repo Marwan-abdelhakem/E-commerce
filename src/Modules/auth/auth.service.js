@@ -74,3 +74,6 @@ export const getAllUsers = async (req, res, next) => {
     }
     return successResponse({ res, statusCode: 200, message: "User:", data: user })
 }
+
+
+//get detials of user 

@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node --watch --env-file=./src/config/.env index.js",
-    "start": "node index.js"
+    "dev": "node --watch --env-file=./src/config/.env.development index.js"
   },
   "keywords": [],
   "author": "",
