@@ -7,6 +7,10 @@ const router = Router()
 
 router.post("/createOrder", authentication, orderService.createOrder)
 
+router.get("/getOrderById/:id", authentication, orderService.getOrderById)
+
+router.get("/getUserOrders", authentication, orderService.getUserOrders)
+
 
 
 export default router
