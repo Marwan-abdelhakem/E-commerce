@@ -108,3 +108,64 @@ export const getUserOrders = async (req, res, next) => {
         data: ordersObj
     });
 };
+
+export const getAllOrders = async (req, res, next) => {
+    try {
+        const { status, paymentStatus, page = 1, limit = 10 } = req.query;
+
+        // بناء الـ filter
+        const filter = {};
+        if (status) filter.status = status;
+        if (paymentStatus) filter.paymentStatus = paymentStatus;
+
+        // حساب الـ pagination
+        const skip = (page - 1) * limit;
+
+        // جلب الطلبات مع الـ pagination
+        const orders = await OrderModel.find(filter)
+            .populate("user", "name email phone")
+            .populate({
+                path: "items.product",
+                model: "Product",
+                select: "name price variations"
+            })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        // حساب إجمالي عدد الطلبات
+        const totalOrders = await OrderModel.countDocuments(filter);
+
+        // معالجة الـ variations
+        const ordersObj = orders.map(order => {
+            const orderData = order.toObject();
+
+            orderData.items = orderData.items.map(item => {
+                if (item.variationId && item.product && item.product.variations) {
+                    item.product.variations = item.product.variations.filter(
+                        v => v._id.toString() === item.variationId.toString()
+                    );
+                }
+                return item;
+            });
+
+            return orderData;
+        });
+
+        return successResponse({
+            res,
+            message: "All orders fetched successfully",
+            data: {
+                orders: ordersObj,
+                pagination: {
+                    currentPage: parseInt(page),
+                    totalPages: Math.ceil(totalOrders / limit),
+                    totalOrders,
+                    limit: parseInt(limit)
+                }
+            }
+        });
+    } catch (error) {
+        return next(error);
+    }
+};
