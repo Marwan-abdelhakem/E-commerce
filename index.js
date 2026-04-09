@@ -25,10 +25,18 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customSiteTitle: 'E-Commerce API Docs'
 }))
 
-await bootStrap(app, express)
-
-app.listen(port, () => {
-  console.log(`Server app listening on port ${port}!`)
-})
+// Bootstrap with error handling
+try {
+  await bootStrap(app, express)
+  
+  app.listen(port, '0.0.0.0', () => {
+    console.log(`✅ Server running on port ${port}`)
+    console.log(`📚 API Docs: http://localhost:${port}/api-docs`)
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`)
+  })
+} catch (error) {
+  console.error('❌ Failed to start server:', error.message)
+  process.exit(1)
+}
 
 export default app;

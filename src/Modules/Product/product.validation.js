@@ -29,7 +29,7 @@ export const createProductSchema = Joi.object({
         'string.max': 'Product name cannot exceed 200 characters',
         'any.required': 'Product name is required'
     }),
-    description: Joi.string().trim().max(2000).optional().messages({
+    description: Joi.string().trim().max(2000).optional().allow('').messages({
         'string.max': 'Description cannot exceed 2000 characters'
     }),
     price: Joi.number().min(0).required().messages({
@@ -40,9 +40,35 @@ export const createProductSchema = Joi.object({
         'string.pattern.base': 'Invalid category ID format',
         'any.required': 'Category is required'
     }),
-    variations: Joi.array().items(variationSchema).min(1).required().messages({
-        'array.min': 'At least one variation is required',
-        'any.required': 'Variations are required'
+    variations: Joi.string().required().custom((value, helpers) => {
+        try {
+            const parsed = JSON.parse(value);
+            if (!Array.isArray(parsed) || parsed.length === 0) {
+                return helpers.error('any.invalid');
+            }
+            
+            // Validate each variation
+            for (const variation of parsed) {
+                const simpleVariationSchema = Joi.object({
+                    colorName: Joi.string().required(),
+                    colorValue: Joi.string().pattern(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/).required(),
+                    isDefault: Joi.boolean().optional(),
+                    stock: Joi.number().min(0).optional()
+                });
+                
+                const { error } = simpleVariationSchema.validate(variation);
+                if (error) {
+                    return helpers.error('any.invalid', { message: error.message });
+                }
+            }
+            
+            return value;
+        } catch (error) {
+            return helpers.error('any.invalid');
+        }
+    }).messages({
+        'any.required': 'At least one variation is required',
+        'any.invalid': 'Invalid variations format or data'
     })
 });
 
