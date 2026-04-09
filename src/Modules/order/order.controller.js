@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { authentication, authorization } from "../../Middelwares/auth.middlewares.js";
+import { validation } from "../../Middelwares/validation.middelwares.js";
+import { createOrderSchema, mongoIdSchema, getAllOrdersQuerySchema } from "./order.validation.js";
 import * as orderService from "./order.service.js"
 
 const router = Router()
@@ -23,6 +25,7 @@ const router = Router()
  *             properties:
  *               items:
  *                 type: array
+ *                 minItems: 1
  *                 description: قائمة المنتجات المطلوبة
  *                 items:
  *                   type: object
@@ -32,14 +35,17 @@ const router = Router()
  *                   properties:
  *                     product:
  *                       type: string
- *                       description: ID المنتج
+ *                       pattern: '^[0-9a-fA-F]{24}$'
+ *                       description: ID المنتج (MongoDB ObjectId)
  *                       example: 507f1f77bcf86cd799439011
  *                     quantity:
  *                       type: number
+ *                       minimum: 1
  *                       description: الكمية المطلوبة
  *                       example: 2
  *                     variationId:
  *                       type: string
+ *                       pattern: '^[0-9a-fA-F]{24}$'
  *                       description: ID الـ variation (اللون/المقاس) - اختياري
  *                       example: 507f1f77bcf86cd799439012
  *           example:
@@ -86,13 +92,30 @@ const router = Router()
  *                       type: string
  *                       enum: [paid, unpaid]
  *       400:
- *         description: خطأ في البيانات المدخلة
+ *         description: خطأ في البيانات المدخلة (Validation Error)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Validation Error
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       field:
+ *                         type: string
+ *                       message:
+ *                         type: string
  *       401:
  *         description: غير مصرح - Token مطلوب
  *       404:
  *         description: المنتج غير موجود أو الـ variation غير موجود
  */
-router.post("/createOrder", authentication, orderService.createOrder)
+router.post("/createOrder", authentication, validation(createOrderSchema), orderService.createOrder)
 
 /**
  * @swagger
@@ -108,6 +131,7 @@ router.post("/createOrder", authentication, orderService.createOrder)
  *         required: true
  *         schema:
  *           type: string
+ *           pattern: '^[0-9a-fA-F]{24}$'
  *         description: معرف الطلب (MongoDB ObjectId)
  *         example: 507f1f77bcf86cd799439011
  *     responses:
@@ -167,12 +191,14 @@ router.post("/createOrder", authentication, orderService.createOrder)
  *                     updatedAt:
  *                       type: string
  *                       format: date-time
+ *       400:
+ *         description: Invalid ID format
  *       401:
  *         description: غير مصرح - Token مطلوب
  *       404:
  *         description: الطلب غير موجود
  */
-router.get("/getOrderById/:id", authentication, orderService.getOrderById)
+router.get("/getOrderById/:id", authentication, validation(mongoIdSchema, 'params'), orderService.getOrderById)
 
 /**
  * @swagger
@@ -374,6 +400,6 @@ router.get("/getUserOrders", authentication, orderService.getUserOrders)
  *       403:
  *         description: غير مسموح - Admin فقط
  */
-router.get("/getAllOrders", authentication, authorization("admin"), orderService.getAllOrders)
+router.get("/getAllOrders", authentication, authorization("admin"), validation(getAllOrdersQuerySchema, 'query'), orderService.getAllOrders)
 
 export default router

@@ -3,7 +3,7 @@ import * as productService from "./product.service.js"
 import { authentication, authorization } from "../../Middelwares/auth.middlewares.js";
 import { fileUpload } from "../../Utlis/multer.utlis.js"
 import { validation } from "../../Middelwares/validation.middelwares.js";
-import { createProductSchema, updateProductSchema } from "./product.validation.js";
+import { createProductSchema, updateProductSchema, mongoIdSchema } from "./product.validation.js";
 
 const router = Router()
 
@@ -291,7 +291,7 @@ router.get("/getAllProducts", productService.getAllProducts)
  *                   type: string
  *                   example: product Not Founded
  */
-router.get("/getProductById/:id", productService.getProductById)
+router.get("/getProductById/:id", validation(mongoIdSchema, 'params'), productService.getProductById)
 
 /**
  * @swagger
@@ -354,7 +354,7 @@ router.get("/getProductById/:id", productService.getProductById)
  *       400:
  *         description: خطأ في البيانات المدخلة
  */
-router.patch("/updateProduct/:id", validation(updateProductSchema), productService.updateProduct)
+router.patch("/updateProduct/:id", validation(mongoIdSchema, 'params'), validation(updateProductSchema), productService.updateProduct)
 
 /**
  * @swagger
@@ -393,6 +393,6 @@ router.patch("/updateProduct/:id", validation(updateProductSchema), productServi
  *                   type: string
  *                   example: product Not Founded
  */
-router.delete("/deleteProduct/:id", productService.deleteProduct)
+router.delete("/deleteProduct/:id", validation(mongoIdSchema, 'params'), productService.deleteProduct)
 
 export default router
