@@ -9,13 +9,38 @@ import orderRouter from "./Modules/order/order.controller.js"
 
 
 const bootStrap = async (app, express) => {
-    // CORS - Allow all origins
+    // CORS - Enhanced configuration
     app.use(cors({
-        origin: '*',
+        origin: function (origin, callback) {
+            // Allow requests with no origin (like mobile apps or curl requests)
+            if (!origin) return callback(null, true);
+            
+            // Allow all origins in development/production
+            return callback(null, true);
+        },
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization']
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+        exposedHeaders: ['Content-Range', 'X-Content-Range'],
+        maxAge: 86400 // 24 hours
     }))
+
+    // Handle preflight requests explicitly
+    app.options('*', cors())
+
+    // Additional CORS headers middleware
+    app.use((req, res, next) => {
+        res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+        res.header('Access-Control-Allow-Credentials', 'true');
+        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+        
+        // Handle preflight
+        if (req.method === 'OPTIONS') {
+            return res.sendStatus(200);
+        }
+        next();
+    })
 
     app.use(express.json())
     app.use(express.urlencoded({ extended: true }));
