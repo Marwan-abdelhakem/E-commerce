@@ -25,9 +25,6 @@ const bootStrap = async (app, express) => {
         maxAge: 86400 // 24 hours
     }))
 
-    // Handle preflight requests explicitly
-    app.options('*', cors())
-
     // Additional CORS headers middleware
     app.use((req, res, next) => {
         res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
