@@ -79,17 +79,13 @@ const productSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// Middleware لحساب الـ stock الكلي قبل الحفظ
+// Middleware لحساب الـ stock الكلي والتأكد من وجود default قبل الحفظ
 productSchema.pre('save', function(next) {
+    // حساب الـ stock الكلي
     if (this.variations && this.variations.length > 0) {
         this.stock = this.variations.reduce((total, variant) => total + (variant.stock || 0), 0);
-    }
-    next();
-});
-
-// Middleware للتأكد من وجود variation واحد على الأقل isDefault
-productSchema.pre('save', function(next) {
-    if (this.variations && this.variations.length > 0) {
+        
+        // التأكد من وجود variation واحد على الأقل isDefault
         const hasDefault = this.variations.some(v => v.isDefault === true);
         if (!hasDefault) {
             // لو مفيش default، خلي أول واحد هو الـ default
