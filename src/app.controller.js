@@ -2,6 +2,7 @@ import connectDb from "./DB/connectDB.js";
 import globalErrorHandler from "./Utlis/errorHandler.utlis.js"
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import mongoose from "mongoose";
 import authRouter from "./Modules/auth/auth.controller.js"
 import productRouter from "./Modules/Product/product.controller.js"
 import categoryRouter from "./Modules/Category/categort.controller.js"
@@ -59,11 +60,23 @@ const bootStrap = async (app, express) => {
 
     await connectDb()
 
+    // Health check endpoint (مهم لـ Render)
+    app.get("/health", (req, res) => {
+        const healthCheck = {
+            uptime: process.uptime(),
+            status: 'OK',
+            timestamp: Date.now(),
+            database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+        };
+        res.status(200).json(healthCheck);
+    });
+
     // Root endpoint
     app.get("/", (req, res) => {
         res.json({
             message: "E-Commerce API is running",
-            documentation: "/api-docs"
+            documentation: "/api-docs",
+            health: "/health"
         })
     })
 
