@@ -80,7 +80,7 @@ const productSchema = new mongoose.Schema(
 );
 
 // Middleware لحساب الـ stock الكلي والتأكد من وجود default قبل الحفظ
-productSchema.pre('save', function(next) {
+productSchema.pre('save', function() {
     // حساب الـ stock الكلي
     if (this.variations && this.variations.length > 0) {
         this.stock = this.variations.reduce((total, variant) => total + (variant.stock || 0), 0);
@@ -92,7 +92,6 @@ productSchema.pre('save', function(next) {
             this.variations[0].isDefault = true;
         }
     }
-    next();
 });
 
 const ProductModel = mongoose.models.Product || mongoose.model("Product", productSchema);
