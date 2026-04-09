@@ -13,19 +13,15 @@ const router = Router()
  * @swagger
  * /api/product/createProduct:
  *   post:
- *     summary: إنشاء منتج جديد مع Variations وصور
+ *     summary: إنشاء منتج جديد مع Variations
  *     description: |
  *       إنشاء منتج جديد مع variations (ألوان مختلفة).
  *       
  *       **ملاحظات مهمة:**
- *       - كل variation لازم يكون له colorName, colorValue (hexa code), stock, وصورة أساسية
+ *       - كل variation لازم يكون له colorName, colorValue (hexa code), defaultImage (URL), وصور إضافية
  *       - الـ stock الكلي للمنتج بيتحسب تلقائياً من مجموع stock كل الـ variations
  *       - لازم يكون في variation واحد على الأقل isDefault: true
  *       - لو مفيش default محدد، أول variation هيبقى هو الـ default تلقائياً
- *       
- *       **تسمية الصور:**
- *       - الصورة الأساسية للـ variation: `variation_0_defaultImage`, `variation_1_defaultImage`, إلخ
- *       - الصور الإضافية: `variation_0_image_0`, `variation_0_image_1`, `variation_1_image_0`, إلخ
  *     tags: [Product]
  *     requestBody:
  *       required: true
@@ -56,31 +52,35 @@ const router = Router()
  *                 description: معرف التصنيف (MongoDB ObjectId)
  *                 example: 507f1f77bcf86cd799439011
  *               variations:
- *                 type: string
- *                 description: |
- *                   مصفوفة الـ variations بصيغة JSON string.
- *                   كل variation يحتوي على: colorName, colorValue (hexa code), stock, isDefault
- *                 example: '[{"colorName":"أسود","colorValue":"#000000","stock":50,"isDefault":true},{"colorName":"أبيض","colorValue":"#FFFFFF","stock":30,"isDefault":false}]'
- *               variation_0_defaultImage:
- *                 type: string
- *                 format: binary
- *                 description: الصورة الأساسية للـ variation الأول (مطلوبة)
- *               variation_0_image_0:
- *                 type: string
- *                 format: binary
- *                 description: صورة إضافية للـ variation الأول (اختياري)
- *               variation_0_image_1:
- *                 type: string
- *                 format: binary
- *                 description: صورة إضافية أخرى للـ variation الأول (اختياري)
- *               variation_1_defaultImage:
- *                 type: string
- *                 format: binary
- *                 description: الصورة الأساسية للـ variation الثاني (مطلوبة)
- *               variation_1_image_0:
- *                 type: string
- *                 format: binary
- *                 description: صورة إضافية للـ variation الثاني (اختياري)
+ *                 type: array
+ *                 description: مصفوفة الـ variations
+ *                 items:
+ *                   type: object
+ *                   required:
+ *                     - colorName
+ *                     - colorValue
+ *                     - defaultImage
+ *                   properties:
+ *                     colorName:
+ *                       type: string
+ *                       example: أسود
+ *                     colorValue:
+ *                       type: string
+ *                       example: "#000000"
+ *                     defaultImage:
+ *                       type: string
+ *                       example: https://example.com/image.jpg
+ *                     variationImgs:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                       example: ["https://example.com/img1.jpg", "https://example.com/img2.jpg"]
+ *                     isDefault:
+ *                       type: boolean
+ *                       example: true
+ *                     stock:
+ *                       type: number
+ *                       example: 50
  *     responses:
  *       201:
  *         description: تم إنشاء المنتج بنجاح
@@ -94,51 +94,10 @@ const router = Router()
  *                   example: Product Created Successfully
  *                 data:
  *                   type: object
- *                   properties:
- *                     _id:
- *                       type: string
- *                     name:
- *                       type: string
- *                     description:
- *                       type: string
- *                     price:
- *                       type: number
- *                     stock:
- *                       type: number
- *                       description: مجموع stock كل الـ variations
- *                     category:
- *                       type: string
- *                     variations:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           colorName:
- *                             type: string
- *                           colorValue:
- *                             type: string
- *                           defaultImage:
- *                             type: string
- *                           variationImgs:
- *                             type: array
- *                             items:
- *                               type: string
- *                           isDefault:
- *                             type: boolean
- *                           stock:
- *                             type: number
  *       400:
  *         description: خطأ في البيانات المدخلة
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Invalid hexa code format for colorValue
  */
-router.post("/createProduct", fileUpload().any(), validation(createProductSchema), productService.createProducts)
+router.post("/createProduct", validation(createProductSchema), productService.createProducts)
 
 /**
  * @swagger
@@ -299,9 +258,9 @@ router.get("/getProductById/:id", validation(mongoIdSchema, 'params'), productSe
  *   patch:
  *     summary: تحديث منتج
  *     description: |
- *       تحديث بيانات منتج موجود (البيانات الأساسية فقط).
+ *       تحديث بيانات منتج موجود (يمكن تحديث أي حاجة بما فيها الـ variations).
  *       
- *       **ملاحظة:** لتحديث الـ variations، يجب استخدام endpoint منفصل أو حذف المنتج وإنشاءه من جديد.
+ *       **ملاحظة:** يمكنك تحديث أي field بما فيها الـ variations كاملة أو جزء منها
  *     tags: [Product]
  *     parameters:
  *       - in: path
@@ -330,6 +289,26 @@ router.get("/getProductById/:id", validation(mongoIdSchema, 'params'), productSe
  *               category:
  *                 type: string
  *                 example: 507f1f77bcf86cd799439011
+ *               variations:
+ *                 type: array
+ *                 description: تحديث الـ variations (اختياري)
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     colorName:
+ *                       type: string
+ *                     colorValue:
+ *                       type: string
+ *                     defaultImage:
+ *                       type: string
+ *                     variationImgs:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                     isDefault:
+ *                       type: boolean
+ *                     stock:
+ *                       type: number
  *               featured:
  *                 type: boolean
  *                 example: true

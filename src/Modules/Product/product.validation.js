@@ -10,10 +10,14 @@ const variationSchema = Joi.object({
         'string.pattern.base': 'Color value must be a valid hexa code (e.g., #FF5733 or #F57)',
         'any.required': 'Color value is required'
     }),
+    defaultImage: Joi.string().uri().required().messages({
+        'string.uri': 'Default image must be a valid URL',
+        'any.required': 'Default image is required'
+    }),
+    variationImgs: Joi.array().items(Joi.string().uri()).default([]),
     isDefault: Joi.boolean().default(false),
-    stock: Joi.number().min(0).required().messages({
-        'number.min': 'Stock cannot be negative',
-        'any.required': 'Stock is required for each variation'
+    stock: Joi.number().min(0).default(0).messages({
+        'number.min': 'Stock cannot be negative'
     })
 });
 
@@ -36,28 +40,9 @@ export const createProductSchema = Joi.object({
         'string.pattern.base': 'Invalid category ID format',
         'any.required': 'Category is required'
     }),
-    variations: Joi.string().required().custom((value, helpers) => {
-        try {
-            const parsed = JSON.parse(value);
-            if (!Array.isArray(parsed) || parsed.length === 0) {
-                return helpers.error('any.invalid');
-            }
-            
-            // Validate each variation
-            for (const variation of parsed) {
-                const { error } = variationSchema.validate(variation);
-                if (error) {
-                    return helpers.error('any.invalid', { message: error.message });
-                }
-            }
-            
-            return value;
-        } catch (error) {
-            return helpers.error('any.invalid');
-        }
-    }).messages({
-        'any.required': 'At least one variation is required',
-        'any.invalid': 'Invalid variations format or data'
+    variations: Joi.array().items(variationSchema).min(1).required().messages({
+        'array.min': 'At least one variation is required',
+        'any.required': 'Variations are required'
     })
 });
 
@@ -67,6 +52,7 @@ export const updateProductSchema = Joi.object({
     description: Joi.string().trim().max(2000).optional(),
     price: Joi.number().min(0).optional(),
     category: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).optional(),
+    variations: Joi.array().items(variationSchema).min(1).optional(),
     featured: Joi.boolean().optional(),
     visible: Joi.boolean().optional()
 }).min(1).messages({
@@ -80,4 +66,3 @@ export const mongoIdSchema = Joi.object({
         'any.required': 'ID is required'
     })
 }).required();
-
