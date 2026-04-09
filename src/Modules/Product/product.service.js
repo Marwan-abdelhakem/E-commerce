@@ -120,9 +120,9 @@ export const createProducts = async (req, res, next) => {
 
 export const getAllProducts = async (req, res, next) => {
     const products = await ProductModel.find()
-    if (products.length === 0) {
-        return next(new Error("products Not Founded", { cause: 409 }))
-    }
+    // if (products.length === 0) {
+    //     return next(new Error("products Not Founded", { cause: 409 }))
+    // }
     return successResponse({ res, statusCode: 200, message: "successfully", data: products })
 }
 
@@ -181,8 +181,8 @@ export const updateProduct = async (req, res, next) => {
         }
 
         const product = await ProductModel.findOneAndUpdate(
-            { _id: id }, 
-            { $set: updateData }, 
+            { _id: id },
+            { $set: updateData },
             { new: true, runValidators: true }
         );
 
@@ -190,11 +190,11 @@ export const updateProduct = async (req, res, next) => {
             return next(new Error("product Not Founded", { cause: 409 }));
         }
 
-        return successResponse({ 
-            res, 
-            statusCode: 200, 
-            message: "product Update successffully", 
-            data: product 
+        return successResponse({
+            res,
+            statusCode: 200,
+            message: "product Update successffully",
+            data: product
         });
     } catch (error) {
         return next(error);

@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
 
 const cartSchema = new mongoose.Schema({
-
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "users"
+        ref: "users" // تأكد أن اسم الموديل هنا مطابق للي سجلته في User model
     },
 
     items: [
@@ -17,10 +16,13 @@ const cartSchema = new mongoose.Schema({
             quantity: {
                 type: Number,
                 default: 1
-            }
+            },
+            variationId: { type: String }
         }
     ]
 
 }, { timestamps: true });
 
-export default mongoose.model("Cart", cartSchema);
+const CartModel = mongoose.models.Cart || mongoose.model("Cart", cartSchema);
+
+export default CartModel;
