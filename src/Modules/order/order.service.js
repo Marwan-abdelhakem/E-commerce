@@ -111,30 +111,15 @@ export const getUserOrders = async (req, res, next) => {
 
 export const getAllOrders = async (req, res, next) => {
     try {
-        const { status, paymentStatus, page = 1, limit = 10 } = req.query;
-
-        // بناء الـ filter
-        const filter = {};
-        if (status) filter.status = status;
-        if (paymentStatus) filter.paymentStatus = paymentStatus;
-
-        // حساب الـ pagination
-        const skip = (page - 1) * limit;
-
-        // جلب الطلبات مع الـ pagination
-        const orders = await OrderModel.find(filter)
+        // جلب جميع الطلبات بدون فلاتر
+        const orders = await OrderModel.find()
             .populate("user", "name email phone")
             .populate({
                 path: "items.product",
                 model: "Product",
                 select: "name price variations"
             })
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(parseInt(limit));
-
-        // حساب إجمالي عدد الطلبات
-        const totalOrders = await OrderModel.countDocuments(filter);
+            .sort({ createdAt: -1 });
 
         // معالجة الـ variations
         const ordersObj = orders.map(order => {
@@ -155,15 +140,7 @@ export const getAllOrders = async (req, res, next) => {
         return successResponse({
             res,
             message: "All orders fetched successfully",
-            data: {
-                orders: ordersObj,
-                pagination: {
-                    currentPage: parseInt(page),
-                    totalPages: Math.ceil(totalOrders / limit),
-                    totalOrders,
-                    limit: parseInt(limit)
-                }
-            }
+            data: ordersObj
         });
     } catch (error) {
         return next(error);

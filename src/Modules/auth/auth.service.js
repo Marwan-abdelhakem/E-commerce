@@ -93,3 +93,20 @@ export const getMyProfile = async (req, res, next) => {
         data: user
     });
 };
+
+// get user info by id (Admin only)
+export const getUserById = async (req, res, next) => {
+    const { id } = req.params;
+
+    const user = await UserModel.findById(id);
+
+    if (!user) {
+        return next(new Error("User not found", { cause: 404 }));
+    }
+
+    return successResponse({
+        res,
+        message: "User info fetched successfully",
+        data: user
+    });
+};

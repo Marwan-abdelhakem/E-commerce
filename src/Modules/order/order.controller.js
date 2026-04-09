@@ -276,44 +276,15 @@ router.get("/getUserOrders", authentication, orderService.getUserOrders)
  *   get:
  *     summary: الحصول على جميع الطلبات (للـ Admin فقط)
  *     description: |
- *       استرجاع جميع الطلبات من كل المستخدمين مع إمكانية الفلترة حسب الحالة.
+ *       استرجاع جميع الطلبات من كل المستخدمين بدون فلاتر.
  *       
  *       **ملاحظة:** هذا الـ endpoint متاح للـ Admin فقط
  *     tags: [Order]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: status
- *         schema:
- *           type: string
- *           enum: [pending, processing, shipped, delivered, cancelled]
- *         description: فلترة الطلبات حسب الحالة (اختياري)
- *         example: pending
- *       - in: query
- *         name: paymentStatus
- *         schema:
- *           type: string
- *           enum: [paid, unpaid]
- *         description: فلترة الطلبات حسب حالة الدفع (اختياري)
- *         example: paid
- *       - in: query
- *         name: page
- *         schema:
- *           type: number
- *           default: 1
- *         description: رقم الصفحة للـ pagination
- *         example: 1
- *       - in: query
- *         name: limit
- *         schema:
- *           type: number
- *           default: 10
- *         description: عدد النتائج في كل صفحة
- *         example: 10
  *     responses:
  *       200:
- *         description: قائمة جميع الطلبات مع معلومات الـ pagination
+ *         description: قائمة جميع الطلبات
  *         content:
  *           application/json:
  *             schema:
@@ -323,83 +294,65 @@ router.get("/getUserOrders", authentication, orderService.getUserOrders)
  *                   type: string
  *                   example: All orders fetched successfully
  *                 data:
- *                   type: object
- *                   properties:
- *                     orders:
- *                       type: array
- *                       items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: 507f1f77bcf86cd799439011
+ *                       user:
  *                         type: object
  *                         properties:
  *                           _id:
  *                             type: string
- *                             example: 507f1f77bcf86cd799439011
- *                           user:
- *                             type: object
- *                             properties:
- *                               _id:
- *                                 type: string
- *                               name:
- *                                 type: string
- *                                 example: أحمد محمد
- *                               email:
- *                                 type: string
- *                                 example: ahmed@example.com
- *                           items:
- *                             type: array
- *                             items:
+ *                           name:
+ *                             type: string
+ *                             example: أحمد محمد
+ *                           email:
+ *                             type: string
+ *                             example: ahmed@example.com
+ *                       items:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             product:
  *                               type: object
  *                               properties:
- *                                 product:
- *                                   type: object
- *                                   properties:
- *                                     _id:
- *                                       type: string
- *                                     name:
- *                                       type: string
- *                                       example: iPhone 15 Pro
- *                                     price:
- *                                       type: number
- *                                       example: 999.99
- *                                 quantity:
- *                                   type: number
- *                                   example: 2
- *                                 variationId:
+ *                                 _id:
  *                                   type: string
- *                           totalPrice:
- *                             type: number
- *                             example: 1999.98
- *                           status:
- *                             type: string
- *                             example: pending
- *                           paymentStatus:
- *                             type: string
- *                             example: unpaid
- *                           createdAt:
- *                             type: string
- *                             format: date-time
- *                           updatedAt:
- *                             type: string
- *                             format: date-time
- *                     pagination:
- *                       type: object
- *                       properties:
- *                         currentPage:
- *                           type: number
- *                           example: 1
- *                         totalPages:
- *                           type: number
- *                           example: 5
- *                         totalOrders:
- *                           type: number
- *                           example: 50
- *                         limit:
- *                           type: number
- *                           example: 10
+ *                                 name:
+ *                                   type: string
+ *                                   example: iPhone 15 Pro
+ *                                 price:
+ *                                   type: number
+ *                                   example: 999.99
+ *                             quantity:
+ *                               type: number
+ *                               example: 2
+ *                             variationId:
+ *                               type: string
+ *                       totalPrice:
+ *                         type: number
+ *                         example: 1999.98
+ *                       status:
+ *                         type: string
+ *                         example: pending
+ *                       paymentStatus:
+ *                         type: string
+ *                         example: unpaid
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
  *       401:
  *         description: غير مصرح - Token مطلوب
  *       403:
  *         description: غير مسموح - Admin فقط
  */
-router.get("/getAllOrders", authentication, authorization("admin"), validation(getAllOrdersQuerySchema, 'query'), orderService.getAllOrders)
+router.get("/getAllOrders", authentication, authorization("admin"), orderService.getAllOrders)
 
 export default router
