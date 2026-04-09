@@ -97,7 +97,7 @@ const router = Router()
  *       400:
  *         description: خطأ في البيانات المدخلة
  */
-router.post("/createProduct", validation(createProductSchema), productService.createProducts)
+router.post("/createProduct", fileUpload().any(), validation(createProductSchema), productService.createProducts)
 
 /**
  * @swagger
